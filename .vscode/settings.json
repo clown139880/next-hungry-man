@@ -1,0 +1,10 @@
+{
+  "editor.fontWeight": 1000,
+  "editor.fontLigatures": true,
+  "editor.fontSize": 16,
+  "cSpell.words": [
+    "mapbox",
+    "UNKNOW",
+    "zoomui"
+  ]
+}

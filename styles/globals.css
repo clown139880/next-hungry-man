@@ -1,0 +1,171 @@
+/* @tailwind base; */
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .heading-xl {
+    @apply text-xl font-bold;
+  }
+  .heading-lg {
+    @apply text-lg font-bold;
+  }
+  .heading-md {
+    @apply font-bold text-md;
+  }
+  .heading-sm {
+    @apply text-sm font-bold tracking-widest text-mediumGrey;
+  }
+  .body-lg {
+    @apply text-base font-normal;
+  }
+  .body-md {
+    @apply text-sm font-bold;
+  }
+  .btn {
+    @apply p-2 text-base font-bold text-white transition duration-200 rounded-full;
+    &__primary {
+      @apply text-white bg-mainPurple hover:bg-mainPurpleHover;
+    }
+    &__secondary {
+      @apply bg-mainPurple bg-opacity-10 text-mainPurple hover:bg-opacity-25 dark:bg-opacity-100 dark:bg-white;
+    }
+    &__danger {
+      @apply text-white bg-mainRed hover:bg-mainRedHover;
+    }
+    &.btn-lg {
+      @apply p-4 font-bold text-md;
+    }
+  }
+}
+
+.active-board {
+  @apply text-white bg-opacity-100;
+}
+
+.column:nth-of-type(5n + 1) h3 span {
+  @apply bg-[#49C4E5];
+}
+.column:nth-of-type(5n + 2) h3 span {
+  @apply bg-[#8471F2];
+}
+.column:nth-of-type(5n + 3) h3 span {
+  @apply bg-[#67E2AE];
+}
+.column:nth-of-type(5n + 4) h3 span {
+  @apply bg-[#ff6fa2];
+}
+.column:nth-of-type(5n + 5) h3 span {
+  @apply bg-[#ffca5e];
+}
+
+.board-height {
+  height: calc(100% - 85px);
+}
+
+             #monaco-editor {
+               width: 100%;
+               height: 600px;
+               border: 1px solid #ccc;
+             }
+      
+             .yRemoteSelection {
+               background-color: rgb(250, 129, 0, .5)
+             }
+      
+             .yRemoteSelectionHead {
+               position: absolute;
+               border-left: orange solid 2px;
+               border-top: orange solid 2px;
+               border-bottom: orange solid 2px;
+               height: 100%;
+               box-sizing: border-box;
+             }
+      
+             .yRemoteSelectionHead::after {
+               position: absolute;
+               content: ' ';
+               border: 3px solid orange;
+               border-radius: 4px;
+               left: -4px;
+               top: -5px;
+             }
+
+                          .ProseMirror {
+                           >*+* {
+                             margin-top: 0.75em;
+                           }
+            
+                           ul,
+                           ol {
+                             padding: 0 1rem;
+                           }
+            
+                           h1,
+                           h2,
+                           h3,
+                           h4,
+                           h5,
+                           h6 {
+                             line-height: 1.1;
+                           }
+            
+                           code {
+                             background-color: rgba(#616161, 0.1);
+                             color: #616161;
+                           }
+            
+                           pre {
+                             background: #0D0D0D;
+                             color: #FFF;
+                             font-family: 'JetBrainsMono', monospace;
+                             padding: 0.75rem 1rem;
+                             border-radius: 0.5rem;
+            
+                             code {
+                               color: inherit;
+                               padding: 0;
+                               background: none;
+                               font-size: 0.8rem;
+                             }
+                           }
+            
+                           img {
+                             max-width: 100%;
+                             height: auto;
+                           }
+            
+                           blockquote {
+                             padding-left: 1rem;
+                             border-left: 2px solid rgba(#0D0D0D, 0.1);
+                           }
+            
+                           hr {
+                             border: none;
+                             border-top: 2px solid rgba(#0D0D0D, 0.1);
+                             margin: 2rem 0;
+                           }
+                         }
+
+
+                                                 ul[data-type="taskList"] {
+                                                   list-style: none;
+                                                   padding: 0;
+                        
+                                                   p {
+                                                     margin: 0;
+                                                   }
+                        
+                                                   li {
+                                                     display: flex;
+                        
+                                                     >label {
+                                                       flex: 0 0 auto;
+                                                       margin-right: 0.5rem;
+                                                       user-select: none;
+                                                     }
+                        
+                                                     >div {
+                                                       flex: 1 1 auto;
+                                                     }
+                                                   }
+                                                 }

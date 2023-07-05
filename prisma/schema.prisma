@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+// model messages {
+// }
+
+// export interface Task {
+//   id: number;
+//   content: string;
+//   isDone: boolean;
+//   comments: Comment[];
+// }
+
+model Board {
+  id          Int       @id @default(autoincrement())
+  title       String
+  jiraId      String?
+  description String?
+  tasks       Task[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  columns     Column[]
+}
+
+model Column {
+  id        Int       @id @default(autoincrement())
+  title     String
+  boardId   Int
+  board     Board     @relation(fields: [boardId], references: [id])
+  tasks     Task[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Task {
+  id       Int       @id @default(autoincrement())
+  title    String
+  content  String
+  boardId  Int
+  columnId Int
+  comments Comment[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  toDos     ToDo[]
+
+  board  Board  @relation(fields: [boardId], references: [id])
+  column Column @relation(fields: [columnId], references: [id])
+}
+
+// export interface Comment {
+//   id: number;
+//   userId: string;
+//   content: string;
+//   taskId: number;
+//   parentId: number;
+// }
+
+model Comment {
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  content  String
+  taskId   Int
+  parentId Int?
+  toDoId   Int?
+  user     User      @relation(fields: [userId], references: [id])
+  task     Task      @relation(fields: [taskId], references: [id])
+  parent   Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children Comment[] @relation("CommentToComment")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  ToDo      ToDo?     @relation(fields: [toDoId], references: [id])
+}
+
+model ToDo {
+  id       Int       @id @default(autoincrement())
+  taskId   Int
+  boardId  Int
+  content  String
+  isDone   Boolean
+  comments Comment[]
+  task     Task      @relation(fields: [taskId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  comments Comment[]
+}
