@@ -56,6 +56,7 @@
     "y-monaco": "^0.1.4",
     "y-protocols": "^1.0.5",
     "y-supabase": "0.0.4-7-alpha",
+    "y-webrtc": "^10.2.5",
     "yjs": "^13.6.6",
     "yup": "^0.32.11"
   },
