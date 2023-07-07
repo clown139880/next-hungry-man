@@ -34,7 +34,7 @@ const TaskDetailModal = ({
       <div className="flex items-start w-full h-full gap-x-2 ">
         <div className="w-full flex-[2]">
           description
-          {data.id == 41 ? (
+          {data.id == 44 ? (
             <TipTapEditor
               uniqueId={"task-" + data.id}
               content={data.content}
@@ -48,9 +48,11 @@ const TaskDetailModal = ({
               }
             />
           ) : (
-            <ReactMarkdown className="w-full prose border lg:prose-xl body-lg text-mediumGrey dark:text-white">
-              {data.content}
-            </ReactMarkdown>
+            <div className="max-h-[500px] w-full overflow-y-auto">
+              <ReactMarkdown className="w-full h-full overflow-y-auto prose border lg:prose-xl body-lg text-mediumGrey dark:text-white">
+                {data.content}
+              </ReactMarkdown>
+            </div>
           )}
           <TaskComments
             taskId={data.id}

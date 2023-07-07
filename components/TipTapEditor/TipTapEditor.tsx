@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
-import { BubbleMenu, Editor, EditorContent } from "@tiptap/react";
+import { BubbleMenu, Editor, EditorContent, Extensions } from "@tiptap/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import TaskItem from "@tiptap/extension-task-item";
@@ -14,7 +14,7 @@ export default function TipTapEditor({
   content,
   onUpdate,
 }: {
-  uniqueId: string;
+  uniqueId?: string;
   content: string;
   onUpdate: (content: string) => Promise<any>;
 }) {
@@ -26,31 +26,27 @@ export default function TipTapEditor({
     if (editorRef.current) return;
     const doc = new Y.Doc();
 
-    console.log(content);
+    var provider: WebrtcProvider | undefined;
 
-    Y.applyUpdateV2(doc, Uint8Array.from(content.split(",").map(Number)));
+    const extensions: Extensions = [
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      StarterKit.configure({
+        // The Collaboration extension comes with its own history handling
+        history: false,
+      }),
+      Collaboration.configure({
+        document: doc,
+      }),
+    ];
 
-    const provider = new WebrtcProvider(`hungryman-room-${uniqueId}`, doc, {
-      password: uniqueId,
-    });
-    const editor = new Editor({
-      // content,
-      // onUpdate: ({ editor }) => {
-      //   console.log("editor", editor.getText());
-      //   onUpdate(editor.getText());
-      // },
-      extensions: [
-        TaskList,
-        TaskItem.configure({
-          nested: true,
-        }),
-        StarterKit.configure({
-          // The Collaboration extension comes with its own history handling
-          history: false,
-        }),
-        Collaboration.configure({
-          document: doc,
-        }),
+    if (uniqueId) {
+      provider = new WebrtcProvider(`hungryman-room-${uniqueId}`, doc, {
+        password: uniqueId,
+      });
+      extensions.push(
         // Register the collaboration cursor extension
         CollaborationCursor.configure({
           provider: provider,
@@ -58,19 +54,34 @@ export default function TipTapEditor({
             name: currentUser?.name,
             color: "#" + Math.floor(Math.random() * 16777215).toString(16),
           },
-        }),
-      ],
+        })
+      );
+    }
+
+    const editor = new Editor({
+      // onUpdate: ({ editor }) => {
+      //   console.log("editor", editor.getText());
+      //   onUpdate(editor.getText());
+      // },
+      extensions: extensions,
     });
     editorRef.current = editor;
 
+    try {
+      Y.applyUpdateV2(doc, Uint8Array.from(content.split(",").map(Number)));
+    } catch (e) {
+      // insert the content
+      editor.commands.setContent(content);
+    }
+
     return () => {
       if (editorRef.current) {
-        onUpdate(Array.from(Y.encodeStateAsUpdateV2(doc)).toString());
+        // onUpdate(Array.from(Y.encodeStateAsUpdateV2(doc)).toString());
       }
       editorRef.current = null;
 
       editor.destroy();
-      provider.destroy();
+      provider?.destroy();
       doc.destroy();
     };
   }, [uniqueId]);

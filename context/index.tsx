@@ -22,6 +22,7 @@ import {
 } from "@supabase/supabase-js";
 import { DropResult } from "react-beautiful-dnd";
 import useLocalStorage from "lib/hooks/useLocalStorage";
+import { useRouter } from "next/router";
 
 const BoardContext = createContext<{
   currentBoard?: Board & {
@@ -66,6 +67,8 @@ const BoardContext = createContext<{
 function BoardProvider({ children }: { children: React.ReactNode }) {
   const [activeBoard, setActiveBoard] = useState(0);
 
+  const router = useRouter();
+
   const { data: boards, refetch: refetchBoards } = useQuery(
     ["boards"],
     async () => {
@@ -84,6 +87,26 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
   );
 
   const currentBoard = boards?.[activeBoard];
+
+  const [fromRouter, setFromRouter] = useState(false);
+
+  useEffect(() => {
+    if (boards?.length && router.query.boardId && !fromRouter) {
+      const boardIndex = boards.findIndex(
+        (board) => board.id.toString() === router.query.boardId
+      );
+      if (boardIndex !== -1) {
+        setActiveBoard(boardIndex);
+      }
+      setFromRouter(true);
+    }
+  }, [fromRouter, boards, router.query.boardId]);
+
+  useEffect(() => {
+    if (currentBoard?.id && fromRouter) {
+      history.pushState({}, "", "?boardId=" + currentBoard?.id);
+    }
+  }, [currentBoard?.id, fromRouter]);
 
   const [tasks, setTasks] = useState<TaskWithTodos[]>([]);
 
@@ -488,6 +511,27 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
           title: updatedBoard.title,
         })
         .eq("id", updatedBoard.id);
+    }
+
+    if (updatedBoard.jiraId && updatedBoard.jiraId != currentBoard!.jiraId) {
+      if (updatedBoard.jiraId) {
+        const issues: any = await fetch(
+          "/api/issue?id=" + updatedBoard.jiraId
+        ).then((res) => res.json());
+
+        issues.tables.forEach((t: any) => {
+          t.tables.forEach((t: any) => {
+            t.rows.forEach(async (r: any) => {
+              await createTask({
+                title: r[1].slice(0, 128),
+                description: r[1],
+                columnId: currentBoard?.columns?.[0].id!,
+                todos: [],
+              });
+            });
+          });
+        });
+      }
     }
 
     refetchBoards();

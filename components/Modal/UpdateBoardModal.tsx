@@ -41,6 +41,12 @@ const UpdateBoardModal = ({ onConfirm }: { onConfirm: () => void }) => {
               type="text"
               placeholder="e.g. Web Design"
             />
+            <TextInput
+              label="JiraId"
+              name="jiraId"
+              type="text"
+              placeholder="e.g. NM-842"
+            />
 
             <label className="block mt-6 capitalize body-md text-mediumGrey dark:text-white">
               Board Columns
@@ -58,6 +64,7 @@ const UpdateBoardModal = ({ onConfirm }: { onConfirm: () => void }) => {
                         type="text"
                         placeholder="e.g. Archived"
                       />
+
                       {columnTasksMap.get(c)?.length == 0 && (
                         <Button
                           loading={false}

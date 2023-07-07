@@ -152,7 +152,7 @@ export default function useMultiPlayer(roomId?: string, userId?: string) {
           console.log("Successfully joined room");
           //   router.push(`/issue/${roomId}`);
         } else {
-          alert(resp);
+          // alert(resp);
           //   router.push(`/issue/`);
         }
       }
