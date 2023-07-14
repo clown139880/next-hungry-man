@@ -44,6 +44,7 @@ const BoardContext = createContext<{
     }
   ) => void;
   updateTodo?: (values: TodoUpdate) => void;
+  addTodo?: (content: string, taskId: number) => void;
   deleteTask?: (taskId: Task["id"]) => void;
   dragTask?: (result: DropResult) => void;
   setActiveBoard?: (index: number) => void;
@@ -59,13 +60,20 @@ const BoardContext = createContext<{
   ) => void;
   currentUser?: User | null;
   login?: (values: { name: string }) => void;
+  taskLastReadMap: Map<Task["id"], Date>;
+  onOpenTask?: (taskId: Task["id"]) => void;
 }>({
   boards: [],
   columnTasksMap: new Map(),
+  taskLastReadMap: new Map(),
 });
 
 function BoardProvider({ children }: { children: React.ReactNode }) {
   const [activeBoard, setActiveBoard] = useState(0);
+
+  const [taskLastReadMap, setTaskLastReadMap] = useState<Map<Task["id"], Date>>(
+    new Map()
+  );
 
   const router = useRouter();
 
@@ -222,6 +230,7 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
                       return {
                         ...task,
                         todos: [...task.todos, subTask],
+                        updatedAt: subTask.createdAt,
                       };
                     }
                     return task;
@@ -246,6 +255,7 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
                             return todo;
                           }),
                         ],
+                        updatedAt: updatedSubTask.updatedAt,
                       };
                     }
                     return task;
@@ -427,7 +437,13 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     }
 
     onTaskUpdateLocal(newTask);
-    await supabaseClient.from("Task").update(newTask).eq("id", newTask.id);
+    await supabaseClient
+      .from("Task")
+      .update({
+        ...newTask,
+        // updatedAt: new Date().toLocaleString(),
+      })
+      .eq("id", newTask.id);
 
     const updatePromises: Promise<any>[] = todos.map(async (subtask) => {
       const updatedSubtask = currentTask?.todos?.find(
@@ -541,6 +557,20 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     await supabaseClient.from("ToDo").update(todo).eq("id", todo.id);
   };
 
+  const addTodo = async (content: string, taskId: number) => {
+    await supabaseClient.from("ToDo").insert({
+      content: content,
+      taskId: taskId,
+      boardId: currentBoard!.id,
+      isDone: false,
+      id: undefined,
+    } as TodoInsert);
+  };
+
+  const deleteTodo = async (todo: TodoUpdate) => {
+    await supabaseClient.from("ToDo").delete().eq("id", todo.id);
+  };
+
   const deleteTask = async (taskId: Task["id"]) => {
     console.log("delete", taskId);
     await supabaseClient.from("ToDo").delete().match({ taskId: taskId });
@@ -621,6 +651,16 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const onOpenTask = (taskId: Task["id"]) => {
+    setTaskLastReadMap((prev) => {
+      const map = new Map(prev);
+
+      map.set(taskId, new Date());
+
+      return map;
+    });
+  };
+
   const value = {
     boards,
     columnTasksMap,
@@ -628,6 +668,7 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     createBoard,
     createColumn,
     updateTodo,
+    addTodo,
     createTask,
     updateTask,
     updateBoard,
@@ -636,6 +677,8 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     dragTask,
     setActiveBoard,
     login,
+    taskLastReadMap,
+    onOpenTask,
     currentUser,
   };
   return (

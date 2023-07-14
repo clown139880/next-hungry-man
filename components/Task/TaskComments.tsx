@@ -13,7 +13,7 @@ export default function TaskComments({
   boardTitle: Board["title"];
   taskTitle: Task["title"];
 }) {
-  const { currentUser } = useBoards();
+  const { currentUser, addTodo } = useBoards();
 
   const { data, refetch } = useQuery(
     ["taskComments", taskId],
@@ -64,6 +64,7 @@ export default function TaskComments({
               refetch();
             }
           }}
+          onTodo={(c) => addTodo?.(c, taskId)}
         ></CommentEditor>
       </div>
     ),
@@ -82,8 +83,8 @@ export default function TaskComments({
   };
 
   return (
-    <div className="mt-6">
-      <h1>TaskComments</h1>
+    <div className="p-2 bg-blue-100 dark:bg-slate-600 rounded-xl">
+      <h3 className="mb-2 body-md text-mediumGrey dark:text-white">comments</h3>
       {TextArea}
       <div>
         {nestedComments.map((c) => (
@@ -121,10 +122,10 @@ function CommentBox({
   return (
     <div className="w-full mt-4 text-gray-1">
       <div className="flex">
-        <div>
-          <span className="mr-2 text-gray-2">{comment.User?.name}:</span>
-        </div>
-        <div className="ml-auto text-gray-2">
+        <span className="mr-2 text-gray-500 text-md">
+          {comment.User?.name}:
+        </span>
+        <div className="ml-auto text-sm text-gray-500">
           {new Date(comment.createdAt).toLocaleString()}
         </div>
       </div>
@@ -132,10 +133,10 @@ function CommentBox({
         <div
           className={
             "w-4 mr-1 relative left-2" +
-            (comment.comments.length > 0 ? " border-gray-2 border-l" : "")
+            (comment.comments.length > 0 ? " border-gray-600 border-l" : "")
           }
         ></div>
-        <div className="py-2 font-normal leading-4">
+        <div className="py-2 font-normal leading-4 dark:text-stone-300">
           <div>{comment.content}</div>
         </div>
       </div>
@@ -143,12 +144,12 @@ function CommentBox({
         <div
           className={
             "w-4 mr-1 relative left-2" +
-            (comment.comments.length > 0 ? " border-gray-2 border-l" : "")
+            (comment.comments.length > 0 ? " border-gray-600  border-l" : "")
           }
         ></div>
         <div className="flex items-center gap-x-2">
           <button
-            className="text-sm"
+            className="text-sm underline"
             onClick={() => {
               onReply(comment.id);
             }}
@@ -169,13 +170,13 @@ function CommentBox({
       </div>
       {currentId == comment.id && (
         <div className="flex">
-          <div className="relative w-4 mr-1 border-l border-gray-2 left-2"></div>
+          <div className="relative w-4 mr-1 border-l border-gray-600 left-2"></div>
           {children}
         </div>
       )}
       {comment.comments.map((child) => (
         <div key={child.id} className="flex">
-          <div className="relative w-4 mr-1 border-l border-gray-2 left-2"></div>
+          <div className="relative w-4 mr-1 border-l border-gray-600 left-2"></div>
           <CommentBox
             comment={child}
             onReply={onReply}
@@ -270,7 +271,13 @@ function CommentItem({ comment }: { comment: Comment }) {
   );
 }
 
-function CommentEditor({ onReply }: { onReply: (content: string) => void }) {
+function CommentEditor({
+  onReply,
+  onTodo,
+}: {
+  onReply: (content: string) => void;
+  onTodo: (content: string) => void;
+}) {
   const [content, setContent] = useState<string>("");
 
   return (
@@ -280,9 +287,18 @@ function CommentEditor({ onReply }: { onReply: (content: string) => void }) {
         onChange={(e) => {
           setContent(e.target.value);
         }}
-        className="w-full p-2 border rounded-md"
+        className="w-full p-2 border rounded-md dark:text-white"
       />
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-x-2">
+        <button
+          onClick={() => {
+            onTodo(content);
+            setContent("");
+          }}
+          className="px-4 py-2 mt-2 text-sm font-bold text-white bg-blue-500 rounded-md"
+        >
+          Add ToDo
+        </button>
         <button
           onClick={() => {
             onReply(content);

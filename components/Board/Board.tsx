@@ -7,7 +7,8 @@ import NewColumn from "./NewColumn";
 import NoBoardsFound from "./NoBoardsFound";
 
 const Board = () => {
-  const { currentBoard, boards, dragTask, columnTasksMap } = useBoards();
+  const { currentBoard, boards, dragTask, columnTasksMap, taskLastReadMap } =
+    useBoards();
 
   if (!boards?.length) return <NoBoardsFound />;
   if (!currentBoard?.columns.length) return <EmptyBoard />;
@@ -23,7 +24,19 @@ const Board = () => {
               taskCount={columnTasksMap.get(column)?.length ?? 0}
             >
               {columnTasksMap.get(column)?.map((task, j) => {
-                return <Task task={task} index={j} key={task.id} />;
+                return (
+                  <Task
+                    task={task}
+                    isUpdated={
+                      task.updatedAt
+                        ? (taskLastReadMap.get(task.id)?.getTime() ?? 0) <
+                          new Date(task.updatedAt).getTime()
+                        : false
+                    }
+                    index={j}
+                    key={task.id}
+                  />
+                );
               })}
             </Column>
           ))}

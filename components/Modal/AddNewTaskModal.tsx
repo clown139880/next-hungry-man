@@ -1,8 +1,8 @@
 import Button from "components/shared/Button";
 import { useBoards } from "context";
-import { Formik, Form, FieldArray } from "formik";
+import { Formik, Form, FieldArray, FormikProps } from "formik";
 import * as Yup from "yup";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import StatusDropdown from "components/shared/StatusDropdown";
 import TextInput from "components/shared/TextInput";
 import InputArray from "components/shared/InputArray";
@@ -10,6 +10,7 @@ import supabaseClient from "supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
+import { Todo } from "context/type";
 
 const AddNewTaskModal = ({ onClose }: { onClose: () => void }) => {
   const { createTask, currentBoard } = useBoards();
@@ -86,13 +87,38 @@ const AddNewTaskModal = ({ onClose }: { onClose: () => void }) => {
     };
   }, []);
 
+  const formRef = useRef<
+    FormikProps<{
+      title: string;
+      description: string;
+      todos: Todo[];
+    }>
+  >(null);
+
+  useEffect(() => {
+    //find markdown todo list in description
+    const regex = /(-|\d\.) \[ \] (.*)/g;
+    console.log(description);
+    const matches = description.match(regex);
+    if (matches) {
+      const todos = matches.map((match) => {
+        return {
+          content: match.replace(/(-|\d\.) \[ \]/, "$1"),
+        };
+      });
+
+      console.log(todos);
+
+      formRef.current?.setFieldValue("todos", todos);
+    }
+  }, [description]);
+
   return (
     <Formik
       initialValues={{
         title: "",
         description: "",
         todos: [],
-        columnId: columnId!,
       }}
       validationSchema={validate}
       onSubmit={(values) => {
@@ -103,9 +129,10 @@ const AddNewTaskModal = ({ onClose }: { onClose: () => void }) => {
         });
         onClose();
       }}
+      innerRef={formRef}
     >
       {(formik) => (
-        <div className="w-full min-w-[50vw] p-6 mx-auto bg-white rounded-md dark:bg-darkGrey md:p-8">
+        <div className="w-full min-w-[50vw] max-h-[80vh] overflow-y-auto  p-6 mx-auto bg-white rounded-md dark:bg-darkGrey md:p-8">
           <h1 className="mb-6 heading-lg">Add New Task</h1>
 
           <Form>
@@ -134,7 +161,24 @@ const AddNewTaskModal = ({ onClose }: { onClose: () => void }) => {
                   columnId={columnId ?? 0}
                   setColumnId={setColumnId}
                 />
-
+                <button
+                  onClick={async () => {
+                    await Promise.all(
+                      formik.values.todos.map((todo, index) => {
+                        createTask?.({
+                          title: todo.content,
+                          description: "",
+                          todos: [],
+                          columnId: columnId!,
+                        });
+                      })
+                    );
+                    onClose();
+                  }}
+                  className="w-full p-2 mt-6 text-base text-white transition duration-200 rounded-full bg-mainPurple hover:bg-mainPurpleHover"
+                >
+                  Split ToDo To Multi Task
+                </button>
                 <button
                   type="submit"
                   className="w-full p-2 mt-6 text-base text-white transition duration-200 rounded-full bg-mainPurple hover:bg-mainPurpleHover"

@@ -11,7 +11,9 @@ import { Task, Todo } from "context/type";
 const Task = ({
   task,
   index,
+  isUpdated,
 }: {
+  isUpdated: boolean;
   task: Task & {
     todos: Todo[];
   };
@@ -37,7 +39,9 @@ const Task = ({
       {(provided) => (
         <>
           <li
-            className="px-4 py-6 text-black bg-white rounded-lg cursor-pointer select-none group shadow-main dark:bg-darkGrey dark:text-white"
+            className={`px-4 py-6 text-black ${
+              isUpdated ? "bg-white" : "bg-white/30"
+            } rounded-lg cursor-pointer select-none group shadow-main dark:bg-darkGrey dark:text-white`}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             ref={provided.innerRef}
@@ -64,11 +68,14 @@ const Task = ({
               }}
             />
           </Modal>
-          <Modal
-            show={updateModal}
-            onClose={() => setUpdateModal(!updateModal)}
-          >
-            <UpdateTaskModal task={task} close={() => setUpdateModal(false)} />
+          <Modal show={updateModal} onClose={() => {}}>
+            <UpdateTaskModal
+              task={task}
+              close={() => {
+                setUpdateModal(false);
+                setOpenTaskModal(true);
+              }}
+            />
           </Modal>
           <Modal
             show={deleteModal}

@@ -31,7 +31,12 @@ export default function Monaco() {
   };
   return (
     <div>
-      <Editor height={"100vh"} theme="vs-dark" onMount={handelEditorDidMount} />
+      <Editor
+        height={"100vh"}
+        language="graphql"
+        theme="vs-dark"
+        onMount={handelEditorDidMount}
+      />
     </div>
   );
 }

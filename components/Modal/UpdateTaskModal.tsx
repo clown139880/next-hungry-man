@@ -94,21 +94,26 @@ const UpdateTaskModal = ({
       }}
       validationSchema={validate}
       onSubmit={(values) => {
-        console.log("onsubmit");
-        updateTask?.({
-          ...values,
-          content: description,
-          columnId,
-        });
-        close();
+        // close();
       }}
     >
       {(formik) => (
-        <div className="w-full min-w-[75vw] p-6 mx-auto bg-white rounded-md dark:bg-darkGrey md:p-8">
-          <h1 className="mb-6 heading-lg">Edit Task</h1>
+        <div className="w-full min-w-[75vw] max-h-[80vh] overflow-y-auto  p-6 mx-auto bg-white rounded-md dark:bg-darkGrey md:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="heading-lg">Edit Task</h1>
+
+            <button
+              onClick={() => {
+                close();
+              }}
+              className="p-2 text-base text-white transition duration-200 rounded-full bg-mainPurple hover:bg-mainPurpleHover"
+            >
+              Close
+            </button>
+          </div>
           <Form>
             <div className="flex items-start justify-between w-full gap-x-3">
-              <div className="flex-[2]">
+              <div className="flex-[1]">
                 <TextInput
                   label="Title"
                   name="title"
@@ -125,26 +130,26 @@ const UpdateTaskModal = ({
                   <div id="vditor" className="vditor dark:!text-white" />
                 </div>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 pr-4">
                 <InputArray label="todos" array={formik.values.todos} />
 
                 <StatusDropdown columnId={columnId} setColumnId={setColumnId} />
-
-                <button
-                  onClick={() => {
-                    console.log("submit");
-                    updateTask?.({
-                      ...formik.values,
-                      content: description,
-                      columnId,
-                    });
-                    close();
-                  }}
-                  type="submit"
-                  className="w-full p-2 mt-6 text-base text-white transition duration-200 rounded-full bg-mainPurple hover:bg-mainPurpleHover"
-                >
-                  Save Changes
-                </button>
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => {
+                      console.log("submit");
+                      updateTask?.({
+                        ...formik.values,
+                        content: description,
+                        columnId,
+                      });
+                      close();
+                    }}
+                    className="w-full p-2 mt-6 text-base text-white transition duration-200 rounded-full bg-mainPurple hover:bg-mainPurpleHover"
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </div>
           </Form>
