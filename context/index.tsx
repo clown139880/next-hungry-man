@@ -62,6 +62,7 @@ const BoardContext = createContext<{
   login?: (values: { name: string }) => void;
   taskLastReadMap: Map<Task["id"], Date>;
   onOpenTask?: (taskId: Task["id"]) => void;
+  achieveBoard?: (boardId: Board["id"]) => void;
 }>({
   boards: [],
   columnTasksMap: new Map(),
@@ -80,7 +81,12 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
   const { data: boards, refetch: refetchBoards } = useQuery(
     ["boards"],
     async () => {
-      const boards = await supabaseClient.from("Board").select("*, Column(*)");
+      const boards = await supabaseClient
+        .from("Board")
+        .select("*, Column(*)")
+        .match({
+          status: "active",
+        });
 
       return boards.data;
     },
@@ -393,6 +399,15 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const achieveBoard = async (boardId: string) => {
+    const { data, error } = await supabaseClient
+      .from("Board")
+      .update({ status: "achieve" })
+      .match({ id: boardId });
+
+    refetchBoards();
+  };
+
   const onTaskUpdateLocal = (task: Task) => {
     setTasks((prev) => {
       return [
@@ -680,6 +695,7 @@ function BoardProvider({ children }: { children: React.ReactNode }) {
     taskLastReadMap,
     onOpenTask,
     currentUser,
+    achieveBoard,
   };
   return (
     <BoardContext.Provider value={value}>{children}</BoardContext.Provider>

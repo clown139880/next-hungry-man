@@ -7,7 +7,7 @@ import Modal from "components/Modal";
 import DeleteBoardModal from "components/Modal/DeleteBoardModal";
 import UpdateBoardModal from "components/Modal/UpdateBoardModal";
 
-const EditButton = ({ type, className='', onConfirm, switchToUpdate, switchToDelete}) => {
+const EditButton = ({ type, className='', onConfirm, switchToUpdate, switchToDelete,onAchieve}) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showUpdateBoardModal, setShowUpdateBoardModal] = useState(false);
   const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
@@ -35,7 +35,7 @@ const EditButton = ({ type, className='', onConfirm, switchToUpdate, switchToDel
 
   return (
     <div className="relative">
-        <button className="h-8 w-8" onClick={() => setShowMenu(!showMenu)}>
+        <button className="w-8 h-8" onClick={() => setShowMenu(!showMenu)}>
             <Image src="/icon-vertical-ellipsis.svg" alt="vertical ellipsis" height={16} width={4} />
         </button>
         <motion.div
@@ -60,6 +60,11 @@ const EditButton = ({ type, className='', onConfirm, switchToUpdate, switchToDel
                     className="text-mainRed"
                     onClick={() => setShowDeleteBoardModal(true)}
                     >Delete {type}
+                      </button>
+                    <button
+                    className="text-mainRed"
+                    onClick={() => onAchieve()}
+                    >Achieve {type}
                     </button>
                     <Modal show={showDeleteBoardModal} onClose={() => setShowDeleteBoardModal(!showDeleteBoardModal)}>
                         <DeleteBoardModal onConfirm={onConfirm} onClose={() => setShowDeleteBoardModal(!showDeleteBoardModal)}/>

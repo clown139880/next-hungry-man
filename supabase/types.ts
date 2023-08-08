@@ -48,6 +48,7 @@ export interface Database {
           description: string | null
           id: number
           jiraId: string | null
+          status: string
           title: string
           updatedAt: string | null
         }
@@ -56,6 +57,7 @@ export interface Database {
           description?: string | null
           id?: number
           jiraId?: string | null
+          status?: string
           title: string
           updatedAt?: string | null
         }
@@ -64,6 +66,7 @@ export interface Database {
           description?: string | null
           id?: number
           jiraId?: string | null
+          status?: string
           title?: string
           updatedAt?: string | null
         }

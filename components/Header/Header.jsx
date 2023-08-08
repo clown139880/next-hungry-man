@@ -12,7 +12,7 @@ import MobileBoardMenu from "components/Modal/MobileBoardMenu";
 const Header = () => {
   const {width} = useWindowSize();
   const [showMenu, setShowMenu] = useState(false);
-  const { currentBoard, deleteBoard } = useBoards();
+  const { currentBoard, deleteBoard,achieveBoard } = useBoards();
   const {theme} = useTheme();
 
 
@@ -57,7 +57,7 @@ const Header = () => {
         </div>
         <div className="flex items-center gap-4 md:pr-4">
             <AddNewTask />
-            <EditButton onConfirm={() => deleteBoard(currentBoard.id)} type="board" className=""/>
+            <EditButton  onAchieve={()=>achieveBoard(currentBoard.id)} onConfirm={() => deleteBoard(currentBoard.id)} type="board" className=""/>
         </div>
     </header>
   )
